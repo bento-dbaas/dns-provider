@@ -3,8 +3,11 @@
 from http import client as http_client
 from urllib.parse import urlparse
 import json
+import logging
 
 from dns_provider.credentials.dev import Credential
+
+LOG = logging.getLogger(__name__)
 
 
 class DNSAPI(object):
@@ -42,7 +45,7 @@ class DNSAPI(object):
             data['auth_token'] = self.__request_token()
 
         data_string = json.dumps(data, indent=2) if data else None
-        #LOG.debug(u'Requisição %s %s', method, complete_url)
+        LOG.debug('Requisição {0} {1}'.format(method, complete_url))
 
         if url.scheme == 'https':
             http = http_client.HTTPSConnection(url.hostname, url.port or 443)
@@ -52,8 +55,8 @@ class DNSAPI(object):
         http.request(method, url_path, data_string, headers)
         response = http.getresponse()
         response_string = response.read()
-        # LOG.debug(u'Response: %d %s\nContent-type: %s\n%s', response.status,
-        #           response.reason, response.getheader('Content-type'), response_string)
+        LOG.debug('Response: {0} {1}\nContent-type: {2}\n{3}'.format(response.status,
+                  response.reason, response.getheader('Content-type'), response_string))
         if response.status == 422:
             pass
 
@@ -61,7 +64,7 @@ class DNSAPI(object):
             pass
 
         if response.status == 401 and retry:
-            # LOG.info(u'Chamada DNSAPI com token inválido... gerando novo token e retentando...')
+            LOG.info('Chamada DNSAPI com token inválido... gerando novo token e retentando...')
             self.__request_token(force=True)
             return self.__request(method, path, data, retry=False)
 
@@ -155,7 +158,7 @@ class DNSAPI(object):
         response = self.__request('POST', '/domains/%d/records.json' % domain_id,
                                 {"record": {"name": name, "type": record_type, "content": content}})
         record = response['record']
-        # LOG.info(u'Cadastrado a entrada: %s', record)
+        LOG.info('Cadastrado a entrada: {0}'.format(record))
         return record
 
     def delete_record(self, record_id):
