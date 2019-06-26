@@ -1,6 +1,17 @@
 setup:
-	@docker build -t dns_provider .
+	@rm -rf venv
+	@test -f venv/bin/activate || virtualenv -p $(shell which python3) venv
+	@. venv/bin/activate ;\
+	pip3 install -r requirements.txt
 run:
-	@docker run -p 80:8000 dns_provider
+	@. venv/bin/activate; \
+	export FLASK_DEBUG=1; \
+	export FLASK_APP=./dns_provider/main.py; \
+	python -m flask run
 test:
-	@coverage run --source=./ -m unittest discover --start-directory ./tests -p "*.py"
+		@. venv/bin/activate; \
+		pytest
+setup_docker:
+	@docker build -t dns_provider .
+run_docker:
+	@docker run -p 8000:8000 dns_provider
