@@ -1,0 +1,67 @@
+This function exposes the uri /dns/. That endpoint creates a DNS on GDNS provider. The HTTP methods accepted are: ['POST'].
+  ---
+  parameters:
+    - in: body
+      name: body
+      description:
+        DNSModel object that needs to be persisted to the database
+      required: true
+      schema:
+        id: DNSModel
+        required:
+          - name
+          - domain
+          - environment
+          - ip
+        properties:
+          name:
+            description: DNS's name
+            type: string
+            example: dbaas
+            minLength: 1
+          domain:
+            description: Domain's name
+            type: string
+            example: dev.globoi.com
+            minLength: 1
+          environment:
+            description: Deploy environment
+            type: string
+            examples: ['dev', 'prod']
+            minLength: 3
+          ip:
+            description: IP address
+            type: string
+            example: 192.168.0.104
+  responses:
+    201:
+      description: New DNS record created
+      schema:
+          type: object
+          properties:
+            data:
+              $ref: '#/definitions/DNSModel'
+    400:
+      description: Invalid Request or Payload format
+      schema:
+        $ref: '#/definitions/ErrorModel'
+    404:
+      description: Domain not found
+      schema:
+        $ref: '#/definitions/ErrorModel'
+    422:
+      description: Could not create DNS, it already exists
+      schema:
+        $ref: '#/definitions/ErrorModel'
+  definitions:
+    ErrorModel:
+      type: object
+      properties:
+        error:
+          properties:
+            message:
+              type: string
+              description: Error message
+            code:
+              type: integer
+              description: HTTP status code
