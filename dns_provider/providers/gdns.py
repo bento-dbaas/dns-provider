@@ -6,6 +6,7 @@ import json
 import logging
 
 from dns_provider.credentials.dev import Credential
+from dns_provider.providers import exceptions
 
 LOG = logging.getLogger(__name__)
 
@@ -57,11 +58,12 @@ class DNSAPI(object):
         response_string = response.read()
         LOG.debug('Response: {0} {1}\nContent-type: {2}\n{3}'.format(response.status,
                   response.reason, response.getheader('Content-type'), response_string))
+
         if response.status == 422:
-            pass
+            raise(exceptions.DNSMissingParameter(path))
 
         if response.status == 404:
-            pass
+            raise(exceptions.DNSNotFound(path))
 
         if response.status == 401 and retry:
             LOG.info('Chamada DNSAPI com token inválido... gerando novo token e retentando...')
@@ -72,7 +74,7 @@ class DNSAPI(object):
             return None
 
         if not (response.status in [200, 201]):
-            pass
+            raise(exceptions.DNSUnknownError(path, response.status=))
 
         if response.getheader('Content-type', 'application/json').startswith('application/json'):
             return json.loads(response_string)

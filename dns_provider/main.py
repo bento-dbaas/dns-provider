@@ -1,31 +1,28 @@
 import json
+import logging
 
 from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
 from flask_httpauth import HTTPBasicAuth
 
+from flasgger import Swagger, swag_from
+
 from dns_provider.providers.gdns import DNSAPI
+from dns_provider import utils
+from dns_provider.providers import exceptions
 
 
 app = Flask(__name__)
+swagger = Swagger(app)
 auth = HTTPBasicAuth()
 cors = CORS(app)
 
 
 @app.route("/dns/", methods=['POST'])
+@swag_from('schemas/create_dns.yml',
+    validation=True,
+    validation_error_handler=utils.validation_error_inform_error)
 def create_dns():
-    """This function exposes the uri /dns/. That endpoint creates a DNS on GDNS
-    provider. The HTTP methods accepted are: ['POST'].
-
-    Payload Parameters:
-    name (str): DNS name
-    domain (str): domain name
-    environment (str): environment
-    ip (str): IP address
-
-    Returns:
-    response (JSON): A JSON response and the status code
-    """
     data = request.get_json()
     dns = '{}.{}'.format(data.get('name'), data.get('domain'))
 
@@ -41,7 +38,14 @@ def create_dns():
         error = "Could not create dns '{}', it already exists!".format(dns)
         return jsonify({'result': error }), 422
 
-    dnsapi.create_record(data.get('name'), data.get('ip'), domain_id=domain_id)
+    try:
+        dnsapi.create_record(data.get('name'), data.get('ip'), domain_id=domain_id)
+    except exceptions.DNSMissingParameter as error_mp:
+        utils.log_and_response(str(error_mp), 422, level=logging.ERROR, is_error=True)
+    except exceptions.DNSNotFound as error_nf:
+        utils.log_and_response(str(error_nf), 404, level=logging.ERROR, is_error=True)
+    except exceptions.DNSUnknownError as error_ue:
+        utils.log_and_response(str(error_nf), error_nf.status, level=logging.ERROR, is_error=True)
 
     return jsonify(data=dict(message="DNS '{}' successfully created.".format(dns))), 201
 
