@@ -3,3 +3,4 @@ Flask-Cors==3.0.8
 Flask-HTTPAuth==3.3.0
 gunicorn==19.9.0
 pytest==4.6.3
+flasgger==0.9.2
