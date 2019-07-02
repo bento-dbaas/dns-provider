@@ -5,3 +5,4 @@ gunicorn==19.9.0
 pytest==4.6.3
 flasgger==0.9.2
 pymongo==3.8.0
+mongoengine==0.18.2
