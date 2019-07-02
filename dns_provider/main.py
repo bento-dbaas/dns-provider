@@ -1,21 +1,26 @@
 import json
 import logging
+import sys
 
 from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
 from flask_httpauth import HTTPBasicAuth
 
 from flasgger import Swagger, swag_from
+from mongoengine import connect
 
 from dns_provider.providers.gdns import DNSAPI
-from dns_provider import utils
+from dns_provider import utils, settings
 from dns_provider.providers import exceptions
 
+LOG = logging.getLogger(__name__)
+logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__)
 swagger = Swagger(app)
 auth = HTTPBasicAuth()
 cors = CORS(app)
+connect(settings.MONGODB_DB, **settings.MONGODB_PARAMS)
 
 
 @app.route("/dns/", methods=['POST'])

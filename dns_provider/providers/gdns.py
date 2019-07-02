@@ -74,7 +74,7 @@ class DNSAPI(object):
             return None
 
         if not (response.status in [200, 201]):
-            raise(exceptions.DNSUnknownError(path, response.status=))
+            raise(exceptions.DNSUnknownError(path, response.status))
 
         if response.getheader('Content-type', 'application/json').startswith('application/json'):
             return json.loads(response_string)
