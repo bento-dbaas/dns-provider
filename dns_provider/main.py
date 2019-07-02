@@ -10,7 +10,7 @@ from flasgger import Swagger, swag_from
 from mongoengine import connect
 
 from dns_provider.providers.gdns import DNSAPI
-from dns_provider import utils, settings
+from dns_provider import utils, settings, models
 from dns_provider.providers import exceptions
 
 LOG = logging.getLogger(__name__)
