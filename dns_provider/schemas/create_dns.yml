@@ -11,7 +11,6 @@ This function exposes the uri /dns/. That endpoint creates a DNS on GDNS provide
         required:
           - name
           - domain
-          - environment
           - ip
         properties:
           name:
@@ -24,11 +23,6 @@ This function exposes the uri /dns/. That endpoint creates a DNS on GDNS provide
             type: string
             example: dev.globoi.com
             minLength: 1
-          environment:
-            description: Deploy environment
-            type: string
-            examples: ['dev', 'prod']
-            minLength: 3
           ip:
             description: IP address
             type: string

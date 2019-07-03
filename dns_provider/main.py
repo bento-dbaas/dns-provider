@@ -31,7 +31,7 @@ def create_dns():
     data = request.get_json()
     dns = '{}.{}'.format(data.get('name'), data.get('domain'))
 
-    dnsapi = DNSAPI(data.get('environment'))
+    dnsapi = DNSAPI('dev')
 
     domain_id = dnsapi.get_domain_id_by_name(domain=data.get('domain'))
     if domain_id is None:
