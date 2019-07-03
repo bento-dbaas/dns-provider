@@ -72,12 +72,12 @@ def delete_dns(name, domain):
     domain_id = dnsapi.get_domain_id_by_name(domain=domain)
     if not domain_id:
         error = "Domain '{}' not found!".format(domain)
-        return jsonify({'result': error }), 404
+        return jsonify({'error': error }), 404
 
     record_id = dnsapi.get_record_by_name(name, domain_id=domain_id)
     if not record_id:
         error = "Name '{}' not found!".format(name)
-        return jsonify({'result': error }), 404
+        return jsonify({'error': error }), 404
 
     dnsapi.delete_record(record_id)
 
