@@ -5,6 +5,9 @@ import json
 from dns_provider.main import app
 
 
+@patch('dns_provider.providers.gdns.DNSAPI.get_record_by_name')
+@patch('dns_provider.providers.gdns.DNSAPI.get_domain_id_by_name')
+@patch('dns_provider.providers.gdns.DNSAPI.create_record')
 class ServiceCreateDNSTestCase(TestCase):
     """This class executes test for create_dns view."""
 
@@ -12,11 +15,16 @@ class ServiceCreateDNSTestCase(TestCase):
         self.client = app.test_client()
         self.client.testing = True
 
-    @patch('dns_provider.providers.gdns.DNSAPI.create_record')
-    def test_create_dns_success(self, mock_create_record):
+    def test_create_dns_success(self,
+                                mock_create_record,
+                                mock_get_domain_id_by_name,
+                                mock_get_record_by_name):
         """It tests the dns creation through '/dns/' path and POST method."""
         success_msg = "DNS 'test-dns-provider.dev.globoi.com' successfully created."
         mock_create_record.return_value = 'test-dns-provider.dev.globoi.com'
+        mock_get_domain_id_by_name.return_value  = 99999
+        mock_get_record_by_name.return_value = None
+
         response = self.client.post('/dns/',
                                     data=json.dumps({
                                         'name':'test-dns-provider',
@@ -30,8 +38,10 @@ class ServiceCreateDNSTestCase(TestCase):
         self.assertEqual(dict(data=dict(message=success_msg)),
                          json.loads(response.data))
 
-    @patch('dns_provider.providers.gdns.DNSAPI.get_domain_id_by_name')
-    def test_create_dns_invalid_domain(self, mock_get_domain_id_by_name):
+    def test_create_dns_invalid_domain(self,
+                                       mock_create_record,
+                                       mock_get_domain_id_by_name,
+                                       mock_get_record_by_name):
         """It tests the dns creation with an invalid domain."""
         mock_get_domain_id_by_name.return_value = None
         error_msg = "Domain 'invalid_domain_test' not found!"
@@ -48,9 +58,8 @@ class ServiceCreateDNSTestCase(TestCase):
         self.assertEqual(response.status_code, 404)
         self.assertEqual(dict(error=error_msg), json.loads(response.data))
 
-    @patch('dns_provider.providers.gdns.DNSAPI.get_record_by_name')
-    @patch('dns_provider.providers.gdns.DNSAPI.get_domain_id_by_name')
     def test_create_dns_name_already_exists(self,
+                                            mock_create_record,
                                             mock_get_domain_id_by_name,
                                             mock_get_record_by_name):
         """It tests the dns creation with a name already exists."""
