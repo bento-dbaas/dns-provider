@@ -46,11 +46,11 @@ def create_dns():
     try:
         dnsapi.create_record(data.get('name'), data.get('ip'), domain_id=domain_id)
     except exceptions.DNSMissingParameter as error_mp:
-        utils.log_and_response(str(error_mp), 422, level=logging.ERROR, is_error=True)
+        return utils.log_and_response(str(error_mp), 422, level=logging.ERROR, is_error=True)
     except exceptions.DNSNotFound as error_nf:
-        utils.log_and_response(str(error_nf), 404, level=logging.ERROR, is_error=True)
+        return utils.log_and_response(str(error_nf), 404, level=logging.ERROR, is_error=True)
     except exceptions.DNSUnknownError as error_ue:
-        utils.log_and_response(str(error_nf), error_nf.status, level=logging.ERROR, is_error=True)
+        return utils.log_and_response(str(error_nf), error_nf.status, level=logging.ERROR, is_error=True)
 
     return jsonify(data=dict(message="DNS '{}' successfully created.".format(dns))), 201
 
