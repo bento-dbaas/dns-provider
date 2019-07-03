@@ -36,12 +36,12 @@ def create_dns():
     domain_id = dnsapi.get_domain_id_by_name(domain=data.get('domain'))
     if domain_id is None:
         error = "Domain '{}' not found!".format(data.get('domain'))
-        return jsonify({'result': error }), 404
+        return jsonify({'error': error }), 404
 
     record_id = dnsapi.get_record_by_name(name=data.get('name'), domain_id=domain_id)
     if record_id:
         error = "Could not create dns '{}', it already exists!".format(dns)
-        return jsonify({'result': error }), 422
+        return jsonify({'error': error }), 422
 
     try:
         dnsapi.create_record(data.get('name'), data.get('ip'), domain_id=domain_id)
