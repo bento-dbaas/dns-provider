@@ -45,6 +45,12 @@ def create_dns():
 
     try:
         dnsapi.create_record(data.get('name'), data.get('ip'), domain_id=domain_id)
+        dns_document = models.DNS(
+            ip=data.get('ip'),
+            name=data.get('name'),
+            domain=data.get('domain')
+        )
+        dns_document.save()
     except exceptions.DNSMissingParameter as error_mp:
         return utils.log_and_response(str(error_mp), 422, level=logging.ERROR, is_error=True)
     except exceptions.DNSNotFound as error_nf:
@@ -55,18 +61,8 @@ def create_dns():
     return jsonify(data=dict(message="DNS '{}' successfully created.".format(dns))), 201
 
 @app.route("/dns/<string:name>/<string:domain>", methods=['DELETE'])
+@swag_from('schemas/delete_dns.yml')
 def delete_dns(name, domain):
-    """This function exposes the uri /dns/<name>/<domain>. That endpoint deleted
-    a DNS on GDNS provider given the proper parameters. The HTTP methods accepted
-    are: ['Delete'].
-
-    Path Parameters:
-    name (str): DNS name
-    domain (str): domain name
-
-    Returns:
-    response (JSON): A JSON response and the status code
-    """
     dnsapi = DNSAPI('dev')
 
     domain_id = dnsapi.get_domain_id_by_name(domain=domain)
