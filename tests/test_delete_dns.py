@@ -40,7 +40,8 @@ class ServiceDeleteDNSTestCase(TestCase):
         response = self.client.delete('/dns/test-dns-provider/invalid_domain_test', content_type='application/json')
 
         self.assertEqual(response.status_code, 404)
-        self.assertEqual(dict(error=error_msg), json.loads(response.data))
+        print(response.data)
+        self.assertEqual(dict(error=error_msg), json.loads(response.data.decode('utf-8')))
 
     def test_delete_dns_invalid_name(self,
                                      mock_delete_record,
@@ -54,4 +55,4 @@ class ServiceDeleteDNSTestCase(TestCase):
         response = self.client.delete('/dns/invalid_dns_name/dev.globoi.com', content_type='application/json')
 
         self.assertEqual(response.status_code, 404)
-        self.assertEqual(dict(error=error_msg), json.loads(response.data))
+        self.assertEqual(dict(error=error_msg), json.loads(response.data.decode('utf-8')))

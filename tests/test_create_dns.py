@@ -36,7 +36,7 @@ class ServiceCreateDNSTestCase(TestCase):
 
         self.assertEqual(response.status_code, 201)
         self.assertEqual(dict(data=dict(message=success_msg)),
-                         json.loads(response.data))
+                         json.loads(response.data.decode('utf-8')))
 
     def test_create_dns_invalid_domain(self,
                                        mock_create_record,
@@ -56,7 +56,7 @@ class ServiceCreateDNSTestCase(TestCase):
                                     content_type='application/json')
 
         self.assertEqual(response.status_code, 404)
-        self.assertEqual(dict(error=error_msg), json.loads(response.data))
+        self.assertEqual(dict(error=error_msg), json.loads(response.data.decode('utf-8')))
 
     def test_create_dns_name_already_exists(self,
                                             mock_create_record,
@@ -77,4 +77,4 @@ class ServiceCreateDNSTestCase(TestCase):
                                     content_type='application/json')
 
         self.assertEqual(response.status_code, 422)
-        self.assertEqual(dict(error=error_msg), json.loads(response.data))
+        self.assertEqual(dict(error=error_msg), json.loads(response.data.decode('utf-8')))
