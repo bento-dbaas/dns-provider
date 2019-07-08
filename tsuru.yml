@@ -1,0 +1,9 @@
+healthcheck:
+  path: /healthcheck
+  scheme: http
+  method: GET
+  status: 200
+  match: .*WORKING*
+  allowed_failures: 0
+  use_in_router: true
+  router_body: content
