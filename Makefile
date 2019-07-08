@@ -15,3 +15,7 @@ setup_docker:
 	@docker build -t dns_provider .
 run_docker:
 	@docker run -p 8000:8000 dns_provider
+deploy_dev:
+	@tsuru app-deploy -a dns-provider-dev .
+deploy_prod:
+	@tsuru app-deploy -a dns-provider .
