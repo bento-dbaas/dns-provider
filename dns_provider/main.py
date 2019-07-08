@@ -8,10 +8,11 @@ from flask_httpauth import HTTPBasicAuth
 
 from flasgger import Swagger, swag_from
 from mongoengine import connect
+from pymongo.errors import ServerSelectionTimeoutError
 
 from dns_provider.providers.gdns import DNSAPI
 from dns_provider import utils, settings, models
-from dns_provider.providers import exceptions
+from dns_provider.providers import exceptions, mongo_connect
 
 LOG = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
@@ -20,8 +21,14 @@ app = Flask(__name__)
 swagger = Swagger(app)
 auth = HTTPBasicAuth()
 cors = CORS(app)
-connect(settings.MONGODB_DB, **settings.MONGODB_PARAMS)
+mongo_connect()
 
+
+@app.errorhandler(exceptions.JSONException)
+def handle_json_exception(error):
+    response = jsonify(error.to_dict())
+    response.status_code = error.status_code
+    return response
 
 @app.route("/dns/", methods=['POST'])
 @swag_from('schemas/create_dns.yml',
@@ -43,20 +50,13 @@ def create_dns():
         error = "Could not create dns '{}', it already exists!".format(dns)
         return jsonify({'error': error }), 422
 
-    try:
-        dnsapi.create_record(data.get('name'), data.get('ip'), domain_id=domain_id)
-        dns_document = models.DNS(
-            ip=data.get('ip'),
-            name=data.get('name'),
-            domain=data.get('domain')
-        )
-        dns_document.save()
-    except exceptions.DNSMissingParameter as error_mp:
-        return utils.log_and_response(str(error_mp), 422, level=logging.ERROR, is_error=True)
-    except exceptions.DNSNotFound as error_nf:
-        return utils.log_and_response(str(error_nf), 404, level=logging.ERROR, is_error=True)
-    except exceptions.DNSUnknownError as error_ue:
-        return utils.log_and_response(str(error_nf), error_nf.status, level=logging.ERROR, is_error=True)
+    dnsapi.create_record(data.get('name'), data.get('ip'), domain_id=domain_id)
+    dns_document = models.DNS(
+        ip=data.get('ip'),
+        name=data.get('name'),
+        domain=data.get('domain')
+    )
+    dns_document.save()
 
     return jsonify(data=dict(message="DNS '{}' successfully created.".format(dns))), 201
 
@@ -78,3 +78,12 @@ def delete_dns(name, domain):
     dnsapi.delete_record(record_id)
 
     return jsonify({}), 204
+
+@app.route("/healthcheck/", methods=['GET'])
+def healthcheck():
+    try:
+        models.DNS.objects.first()
+    except ServerSelectionTimeoutError as connection_error:
+        message = 'Could not connect to MongoDB: {}'.format(str(connection_error))
+        raise exceptions.JSONException(message, 500)
+    return 'WORKING', 200
