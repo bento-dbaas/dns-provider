@@ -86,4 +86,4 @@ def healthcheck():
     except ServerSelectionTimeoutError as connection_error:
         message = 'Could not connect to MongoDB: {}'.format(str(connection_error))
         raise exceptions.JSONException(message, 500)
-    return 'WORKING', 200
+    return 'SUCCESS', 200
