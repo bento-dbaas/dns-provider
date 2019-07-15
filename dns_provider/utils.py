@@ -22,7 +22,7 @@ def validation_error_inform_error(error, data, schema):
     Returns:
     response (Response object): The HTTP response object
     """
-    abort(format_response(str(error.message), HTTPStatus.BAD_REQUEST))
+    abort(format_response(str(error.message), HTTPStatus.BAD_REQUEST, True))
 
 def log_and_response(msg, code, level=logging.DEBUG, is_error=False):
     """ Function designed to log using logging library and return a Response
