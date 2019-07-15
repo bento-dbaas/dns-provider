@@ -10,6 +10,7 @@ run:
 	python -m flask run
 test:
 		@. venv/bin/activate; \
+		export APP_SETTINGS=dns_provider.config.TestingConfig; \
 		pytest
 setup_docker:
 	@docker build -t dns_provider .
