@@ -60,24 +60,42 @@ def create_dns():
 
     return jsonify(data=dict(message="DNS '{}' successfully created.".format(dns))), 201
 
-@app.route("/dns/<string:name>/<string:domain>", methods=['DELETE'])
+@app.route("/dns/<string:name>/<string:domain>", methods=['DELETE', 'GET'])
 @swag_from('schemas/delete_dns.yml')
 def delete_dns(name, domain):
     dnsapi = DNSAPI('dev')
 
-    domain_id = dnsapi.get_domain_id_by_name(domain=domain)
-    if not domain_id:
-        error = "Domain '{}' not found!".format(domain)
-        return jsonify({'error': error }), 404
+    if request.method == 'DELETE':
+        domain_id = dnsapi.get_domain_id_by_name(domain=domain)
+        if not domain_id:
+            error = "Domain '{}' not found!".format(domain)
+            return jsonify({'error': error }), 404
 
-    record_id = dnsapi.get_record_by_name(name, domain_id=domain_id)
-    if not record_id:
-        error = "Name '{}' not found!".format(name)
-        return jsonify({'error': error }), 404
+        record_id = dnsapi.get_record_by_name(name, domain_id=domain_id)
+        if not record_id:
+            error = "Name '{}' not found!".format(name)
+            return jsonify({'error': error }), 404
 
-    dnsapi.delete_record(record_id)
+        dnsapi.delete_record(record_id)
 
-    return jsonify({}), 204
+        return jsonify({}), 204
+    else:
+        domain_id = dnsapi.get_domain_id_by_name(domain=domain)
+        if not domain_id:
+            error = "Domain '{}' not found!".format(domain)
+            return jsonify({'error': error }), 404
+
+        record_id = dnsapi.get_record_by_name(name, domain_id=domain_id)
+        if not record_id:
+            error = "Name '{}' not found!".format(name)
+            return jsonify({'error': error }), 404
+
+        return jsonify(dict(
+            record_id=record_id,
+            domain_id=domain_id,
+            name=name,
+            domain=domain)), 200
+
 
 @app.route("/healthcheck/", methods=['GET'])
 def healthcheck():
