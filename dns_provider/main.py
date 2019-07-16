@@ -103,8 +103,22 @@ class DNSRetrieveDestroyAPIView(MethodView):
 
         return jsonify(), 204
 
+    def get(self, name, domain):
+        '''
+        file: schemas/get_dns.yml
+        '''
+        dnsapi = DNSAPI('dev')
+
+        dns = models.DNS.objects(name=name, domain=domain).first()
+
+        if not dns:
+            error = "DNS '{}.{}' not found!".format(name, domain)
+            return jsonify(error=dict(message=error, code=404)), 404
+
+        return jsonify(data=dns.serialize()), 200
+
 dns_retrive_destroy_view = DNSRetrieveDestroyAPIView.as_view('single_dns_api')
-app.add_url_rule('/dns/<string:name>/<string:domain>', view_func=dns_retrive_destroy_view, methods=['DELETE',])
+app.add_url_rule('/dns/<string:name>/<string:domain>', view_func=dns_retrive_destroy_view, methods=['DELETE', 'GET'])
 
 
 @app.route("/healthcheck/", methods=['GET'])

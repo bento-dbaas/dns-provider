@@ -1,0 +1,30 @@
+This function exposes the uri /dns/<name>/<domain>. That endpoint gets a DNS on GDNS provider, given the proper parameters.
+  ---
+  parameters:
+    - in: path
+      name: name
+      type: string
+      required: true
+    - in: path
+      name: domain
+      type: string
+      required: true
+  responses:
+    200:
+      description: DNS record was found
+    404:
+      description: Domain or Name not found
+      schema:
+        $ref: '#/definitions/ErrorModel'
+  definitions:
+    ErrorModel:
+      type: object
+      properties:
+        error:
+          properties:
+            message:
+              type: string
+              description: Error message
+            code:
+              type: integer
+              description: HTTP status code
