@@ -40,7 +40,7 @@ def log_and_response(msg, code, level=logging.DEBUG, is_error=False):
     LOG.log(level, msg)
     return format_response(msg, code, is_error)
 
-def format_response(msg, code, is_error):
+def format_response(msg, code, is_error=False):
     """It formats a response following the json:api specification. For instance,
     it deals with simple responses for single and multiple objects or errors.
 
