@@ -1,4 +1,4 @@
-This function exposes the uri /dns/<name>/<domain>. That endpoint deleted a DNS on GDNS provider given the proper parameters.
+This function exposes the uri /dns/<name>/<domain>. That endpoint deletes a DNS on GDNS provider given the proper parameters.
   ---
   parameters:
     - in: path
