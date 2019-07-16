@@ -9,3 +9,10 @@ class DNS(Document):
     @property
     def uuid(self):
         return str(self.pk)
+
+    def serialize(self):
+        return {
+            'ip': self.ip,
+            'name': self.name,
+            'domain': self.domain
+        }
