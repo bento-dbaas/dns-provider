@@ -88,6 +88,12 @@ class DNSRetrieveDestroyAPIView(MethodView):
         '''
         dnsapi = DNSAPI('dev')
 
+        dns = models.DNS.objects(name=name, domain=domain).first()
+
+        if not dns:
+            error = "DNS '{}.{}' not found!".format(name, domain)
+            return jsonify(error=dict(message=error, code=404)), 404
+
         domain_id = dnsapi.get_domain_id_by_name(domain=domain)
         if not domain_id:
             error = "Domain '{}' not found!".format(domain)
@@ -99,7 +105,7 @@ class DNSRetrieveDestroyAPIView(MethodView):
             return jsonify(error=dict(message=error, code=404)), 404
 
         dnsapi.delete_record(record_id)
-        models.DNS.objects(name=name, domain=domain).delete()
+        dns.delete()
 
         return jsonify(), 204
 

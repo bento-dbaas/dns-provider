@@ -53,6 +53,22 @@ class ServiceDeleteDNSTestCase(TestCase):
         self.assertEqual(response.status_code, 204)
         self.assertEqual(len(models.DNS.objects.all()), 0)
 
+    def test_delete_dns_object_does_not_exist(self,
+                                     mock_delete_record,
+                                     mock_get_domain_id_by_name,
+                                     mock_get_record_by_name):
+        """It tests the dns creation with a name not created by the dns provider."""
+        invalid_name = 'invalid_name'
+        error_msg = "DNS '{}.{}' not found!".format(invalid_name, self.fake_domain)
+        error_status_code = 404
+        fake_error_response = dict(error=dict(message=error_msg, code=error_status_code))
+
+        response = self.client.delete('/dns/{}/{}'.format(invalid_name, self.fake_domain), content_type='application/json')
+
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(fake_error_response, response.json)
+        self.assertEqual(len(models.DNS.objects.all()), 1)
+
     def test_delete_dns_invalid_domain(self,
                                        mock_delete_record,
                                        mock_get_domain_id_by_name,
