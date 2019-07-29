@@ -26,3 +26,6 @@ else:
     MONGODB_PARAMS['port'] = MONGODB_PORT
     MONGODB_PARAMS['username'] = MONGODB_USER
     MONGODB_PARAMS['password'] = MONGODB_PWD
+
+APP_USERNAME = getenv("APP_USERNAME", None)
+APP_PASSWORD = getenv("APP_PASSWORD", None)

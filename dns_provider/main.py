@@ -7,6 +7,7 @@ from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
 from flask_httpauth import HTTPBasicAuth
 from flask.views import MethodView
+from flask_httpauth import HTTPBasicAuth
 
 from flasgger import Swagger, swag_from, validate
 from mongoengine import connect
@@ -35,10 +36,21 @@ def create_app(testing=False):
     return app
 
 app = create_app()
+auth = HTTPBasicAuth()
+
+
+@auth.verify_password
+def verify_password(username, password):
+    if settings.APP_USERNAME and username != settings.APP_USERNAME:
+        return False
+    if settings.APP_PASSWORD and password != settings.APP_PASSWORD:
+        return False
+    return True
 
 
 class DNSCreateAPIView(MethodView):
     """This class handles requests to /dns/ endpoint."""
+    decorators = [auth.login_required]
 
     def post(self):
         '''
@@ -75,12 +87,14 @@ class DNSCreateAPIView(MethodView):
 
         return jsonify(data=dns_document.serialize()), 201
 
+
 dns_create_view = DNSCreateAPIView.as_view('dns_api')
-app.add_url_rule('/dns/', view_func=dns_create_view, methods=['POST',])
+app.add_url_rule('/dns/', view_func=dns_create_view, methods=['POST'])
 
 
 class DNSRetrieveDestroyAPIView(MethodView):
     """This class handles requests to /dns/<name>/<domain> endpoint."""
+    decorators = [auth.login_required]
 
     def delete(self, name, domain):
         '''
