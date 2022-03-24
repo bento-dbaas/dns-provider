@@ -5,7 +5,7 @@ import collections
 
 from mongoengine import connect, disconnect
 
-from dns_provider import models
+from dns_provider.database import models
 from dns_provider.main import app
 
 
