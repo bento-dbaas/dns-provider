@@ -104,3 +104,6 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# password file
+.export-dns-provider-local-dev.sh
