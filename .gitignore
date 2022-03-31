@@ -30,6 +30,8 @@ MANIFEST
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.
 *.manifest
 *.spec
+.idea/
+
 
 # Installer logs
 pip-log.txt
@@ -102,3 +104,6 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# password file
+.export-dns-provider-local-dev.sh
