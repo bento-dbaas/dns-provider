@@ -20,3 +20,5 @@ deploy_dev:
 	@tsuru app-deploy -a dns-provider-dev .
 deploy_prod:
 	@tsuru app-deploy -a dns-provider .
+run_local:
+	export FLASK_APP=./dns_provider/main.py; python -m flask run
