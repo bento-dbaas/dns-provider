@@ -17,7 +17,7 @@ Jinja2==3.0.3
 jsonschema==4.0.0
 MarkupSafe==2.0.1
 mongoengine==0.24.0
-pymongo==4.0
+pymongo==3.8.0
 pyrsistent==0.18.0
 pytz==2021.3
 six==1.16.0
