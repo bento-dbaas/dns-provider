@@ -5,7 +5,7 @@ from unittest.mock import patch
 from mongoengine import connect, disconnect
 
 from dns_provider.main import app
-from dns_provider import models
+from dns_provider.database import models
 
 
 @patch('dns_provider.providers.gdns.DNSAPI.get_record_by_name')
