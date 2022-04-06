@@ -88,18 +88,18 @@ class DnsItem(Resource):
 
         if not dns:
             error = "DNS '{}.{}' not found!".format(name, domain)
-            return jsonify(error=dict(message=error, code=404)), 404
+            return error, 404
 
         domain_id = dnsapi.get_domain_id_by_name(domain=domain)
         if not domain_id:
             error = "Domain '{}' not found!".format(domain)
-            return jsonify(error=dict(message=error, code=404)), 404
+            return error, 404
 
         record_id = dnsapi.get_record_by_name(name, domain_id=domain_id)
         if not record_id:
             error = "Name '{}' not found!".format(name)
-            return jsonify(error=dict(message=error, code=404)), 404
+            return error, 404
 
         delete_dns(name, domain)
 
-        return jsonify(), 204
+        return 'Dns successfully deleted', 204
